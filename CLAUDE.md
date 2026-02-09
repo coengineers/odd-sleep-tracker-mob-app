@@ -1,4 +1,4 @@
-# odd-sleep-tracker-mob-app Development Guidelines
+# Application Development Guidelines
 
 Auto-generated from all feature plans. Last updated: 2026-02-08
 
