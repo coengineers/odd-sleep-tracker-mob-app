@@ -64,37 +64,28 @@ npx skills add https://github.com/jeffallan/claude-skills --skill flutter-expert
 ```
 specify init .
 ```
-4. Upload Brand Kit
 
-```
-/docs/brand-kit.md
-```
-5. Create Constitution
+4. Create Constitution
 
 ```
 /speckit.constitution Update constitution with '/docs/PRD.md'
 /speckit.constitution Update constitution with 'docs/brand-kit.md'
 ```
 
-6. Run first cycle of spec-kit
+5. Run first cycle of spec-kit
 
 ```
-/speckit.specify Impelement D0 - D2 from '/docs/PRD.md'
+/speckit.specify Impelement D0 '/docs/PRD.md'
 ```
-7. Once first Speck Implemented Recommend to remove email verification before signing Up.
 
-8. Ask Agent to create a quickstart if not Created.
+6. Ask Agent to create a quickstart if not Created.
     - Usually consisits of:
         - Configure environment
         - Start the app
 
-9. Run second cycle of spec-kit
+7. Run second cycle of spec-kit
 
 ```
-/speckit.specify Impelement D3 - D5 from '/docs/PRD.md' and   
-also make sure '/docs/brand-kit.md' colors are used, default to 
-dark theme.
+/speckit.specify Impelement D1 from '/docs/PRD.md'
 ```
-
-### Common Issue
 
