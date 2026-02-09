@@ -365,62 +365,34 @@ Constraints:
 
 ## 10) Deliverables Plan (Agent Build Units)
 
-### D0 — Flutter scaffold, navigation framework, and local DB foundation (no app-specific screens or schemas)
+### D0 — Flutter scaffold & navigation
 
-* **Objective:** Establish a clean Flutter project baseline with routing + state-management wiring, plus an on-device DB foundation that can support later feature schemas.
-* **Scope:** Project scaffold + navigation framework + drift/SQLite foundations. **No app-specific screen names, UI flows, or table schemas in this deliverable.**
-* **Tech choices:** Flutter + go_router; Riverpod base wiring; drift dependency + database bootstrap.
+* **Objective:** App boots with routing + screen shells + shared UI.
+* **Scope:** FR-001 navigation map + basic theming
+* **Tech choices:** Flutter + go_router; Riverpod setup (providers folder)
 * **Artifacts:**
 
-  * Flutter project structure (folders, linting, formatting, CI-ready basics)
-  * go_router setup with placeholder routes/screens purely to prove navigation works
-  * Riverpod bootstrap (ProviderScope, base providers folder)
-  * drift/SQLite setup: database class bootstrap, connection, and migration strategy wiring (but **no tables yet**)
-  * README: run/lint/test + brief architecture notes
+  * Flutter project, routes for Home/Log/History/Insights
+  * Basic layout, bottom nav or simple home links (choose one and keep consistent)
+  * README: run/lint/test
 * **Acceptance (BDD):**
 
   * Given a fresh install
     When the user opens the app
-    Then the app launches successfully and navigation between placeholder routes works
-  * Given the app is running
-    When the database is initialised
-    Then a SQLite database is created/opened without errors and is ready for future schemas
+    Then Home renders and navigation reaches all 4 screens
 
-### D1 — App-specific screen shells + app-specific DB schema
+### D1 — Local database + repository layer (drift)
 
-* **Objective:** Define the app’s initial UX surface area (screen shells) and persistable data model (schema) for the chosen app.
-* **Scope:** Screen scaffolding + schema definition + minimal integration proof (no full feature logic yet).
-* **SleepLog (Sleep Tracker) specifics:**
-
-  * Create 4 screen shells: Home, Log Entry, History, Insights
-  * Update navigation to route to these screens (replace placeholders)
-  * Add drift schema for `sleep_entries` and initial migration
-* **Artifacts:**
-
-  * 4 screen widgets with basic layouts + empty states/placeholders for future components
-  * drift table(s), indexes, constraints, and generated code
-  * Smoke test (or small unit test) that opens DB and verifies schema exists
-* **Acceptance (BDD):**
-
-  * Given a fresh install
-    When the user opens the app
-    Then the Home screen renders and navigation reaches all 4 screens
-  * Given the database layer is initialised
-    When the app starts
-    Then the `sleep_entries` schema is created and migrations run cleanly
-
-### D2 — Local database repository layer (drift)
-
-* **Objective:** Local persistence + migrations with app-specific CRUD.
+* **Objective:** Local persistence + migrations.
 * **Scope:** Section 6 + FR-002/003/004/006/008
 * **Artifacts:**
 
-  * drift DB schema + migration strategy (building on D1)
+  * drift DB schema + migration strategy
   * Repository with CRUD + validation + duration calculation
   * Unit tests (flutter_test) for compute + CRUD using in-memory sqlite where possible
 * **Acceptance:** create/list/update/delete work and enforce constraints.
 
-### D3 — Log Entry screen (create/edit)
+### D2 — Log Entry screen (create/edit)
 
 * **Objective:** Users can add/edit entries with solid validation UX.
 * **Scope:** FR-002/003/004/008/012
@@ -430,17 +402,17 @@ Constraints:
   * On save: compute duration, derive wake_date, write to DB
 * **Artifacts:** UI + tests for validation paths.
 
-### D4 — Home + History screens
+### D3 — Home + History screens
 
 * **Objective:** Home summary + history list + delete/undo.
 * **Scope:** FR-005/006/007/011
 * **Implementation notes:**
 
-  * History: ListView.builder, Dismissible/Slidable, confirm dialog, SnackBar Undo (5s)
+  * History: ListView.builder, Dismissible/Slidable, confirm dialog, SnackBar Undo
   * Home: query “today’s entry” + mini chart input
 * **Artifacts:** UI + tests for delete/undo and “today summary” selection.
 
-### D5 — Insights screen (charts + summaries)
+### D4 — Insights screen (charts + summaries)
 
 * **Objective:** Charts + plain-English patterns.
 * **Scope:** FR-009/010/011
@@ -451,7 +423,7 @@ Constraints:
   * Missing days handled gracefully (gaps or zero values—define behaviour in code comments)
 * **Artifacts:** UI + aggregation tests.
 
-### D6 — Polish, QA, release readiness
+### D5 — Polish, QA, release readiness
 
 * **Objective:** Stabilise UX, accessibility, and reliability.
 * **Scope:** NFR-001/003/004/005 + regression pass
