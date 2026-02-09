@@ -3,6 +3,7 @@
 Auto-generated from all feature plans. Last updated: 2026-02-08
 
 ## Active Technologies
+- N/A (no persistence in D0) (001-flutter-scaffold-nav)
 
 - Dart 3.4+ / Flutter 3.22+ (stable channel) + go_router ^17.1.0, flutter_riverpod ^3.2.1, intl (date formatting) (001-flutter-scaffold-nav)
 
@@ -22,6 +23,7 @@ tests/
 Dart 3.4+ / Flutter 3.22+ (stable channel): Follow standard conventions
 
 ## Recent Changes
+- 001-flutter-scaffold-nav: Added Dart 3.4+ / Flutter 3.22+ (stable channel) + go_router ^17.1.0, flutter_riverpod ^3.2.1
 
 - 001-flutter-scaffold-nav: Added Dart 3.4+ / Flutter 3.22+ (stable channel) + go_router ^17.1.0, flutter_riverpod ^3.2.1, intl (date formatting)
 

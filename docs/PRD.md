@@ -373,7 +373,7 @@ Constraints:
 * **Artifacts:**
 
   * Flutter project, routes for Home/Log/History/Insights
-  * Basic layout, bottom nav or simple home links (choose one and keep consistent)
+  * Bottom navigation bar
   * README: run/lint/test
 * **Acceptance (BDD):**
 
