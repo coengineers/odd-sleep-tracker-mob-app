@@ -50,7 +50,44 @@ emulator -avd Pixel_7_API_34 -wipe-data
 emulator -avd Pixel_7_API_34 -no-snapshot-load
 ```
 
-### **Setup Project**
+### How to Start the Flutter App
+
+#### Prerequisites
+
+- Flutter SDK 3.38+ (stable channel) with Dart 3.10+
+- A connected device or running emulator (`flutter devices` to verify)
+
+#### Steps
+
+1. **Install dependencies**
+
+```bash
+flutter pub get
+```
+
+2. **Run the app**
+
+```bash
+flutter run
+```
+
+To target a specific device (if multiple are connected):
+
+```bash
+flutter run -d <DEVICE_ID>
+```
+
+Use `flutter devices` to list available device IDs.
+
+3. **Run tests**
+
+```bash
+flutter test
+```
+
+---
+
+### **Project Setup To Build From Scratch**
 
 1. Either Replace `/docs/PRD_AGENT_TEMPLATE.md`  with Already Generated `/docs/PRD.md`  or ask agent to create one for you using this template.
 2. Install Skills  
