@@ -1,6 +1,9 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sleeplog/database/app_database.dart';
+import 'package:sleeplog/providers/database_providers.dart';
 import 'package:sleeplog/routing/app_router.dart';
 import 'package:sleeplog/screens/history_screen.dart';
 import 'package:sleeplog/screens/home_screen.dart';
@@ -114,17 +117,26 @@ void main() {
 
   testWidgets('/log?id=abc123 passes entryId to LogEntryScreen', (tester) async {
     final router = createRouter();
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(() => db.close());
 
     await tester.pumpWidget(
       ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(db),
+        ],
         child: MaterialApp.router(routerConfig: router, theme: AppTheme.dark),
       ),
     );
     await tester.pumpAndSettle();
 
     router.push('/log?id=abc123');
-    await tester.pumpAndSettle();
+    // Pump once to navigate, then once more for the FutureProvider to resolve
+    await tester.pump();
+    await tester.pump();
 
+    // The screen shows "Edit Entry" title (entry not found triggers pop via
+    // addPostFrameCallback, but before that the title is visible)
     expect(find.text('Edit Entry'), findsOneWidget);
   });
 }

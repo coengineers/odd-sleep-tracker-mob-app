@@ -74,6 +74,43 @@ class AppTheme {
       foregroundColor: _onPrimary,
       shape: CircleBorder(),
     ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: _bgSurface,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFF23283A)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFF23283A)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: _primary, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFEF4444)),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      hintStyle: const TextStyle(
+        fontFamily: 'Nunito',
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: Color(0xFF6E748A),
+      ),
+      errorStyle: const TextStyle(
+        fontFamily: 'Nunito',
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: Color(0xFFEF4444),
+      ),
+    ),
     materialTapTargetSize: MaterialTapTargetSize.padded,
   );
 
