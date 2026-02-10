@@ -19,9 +19,20 @@ class MiniDurationChart extends StatelessWidget {
     final maxMinutes = data.fold<int>(0, (m, p) => p.durationMinutes > m ? p.durationMinutes : m);
     final maxY = (maxMinutes > 480 ? maxMinutes : 480).toDouble();
 
-    return SizedBox(
+    // Compute average of non-zero durations for accessibility label.
+    final nonZero = data.where((d) => d.durationMinutes > 0).toList();
+    final avgMinutes = nonZero.isEmpty
+        ? 0
+        : nonZero.fold<int>(0, (sum, d) => sum + d.durationMinutes) ~/ nonZero.length;
+    final avgH = avgMinutes ~/ 60;
+    final avgM = avgMinutes % 60;
+    final semanticsLabel = 'Last 7 days sleep duration chart. Average: ${avgH}h ${avgM}m';
+
+    return Semantics(
+      label: semanticsLabel,
+      child: SizedBox(
       height: 120,
-      child: BarChart(
+      child: ExcludeSemantics(child: BarChart(
         BarChartData(
           maxY: maxY,
           minY: 0,
@@ -68,7 +79,8 @@ class MiniDurationChart extends StatelessWidget {
             );
           }),
         ),
-      ),
+      )),
+    ),
     );
   }
 }

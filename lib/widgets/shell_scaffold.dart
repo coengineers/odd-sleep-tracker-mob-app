@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../providers/home_providers.dart';
+import '../providers/invalidate_providers.dart';
 
 class ShellScaffold extends ConsumerWidget {
   const ShellScaffold({super.key, required this.navigationShell});
@@ -14,11 +14,10 @@ class ShellScaffold extends ConsumerWidget {
     return Scaffold(
       body: navigationShell,
       floatingActionButton: FloatingActionButton(
+        tooltip: 'Log sleep',
         onPressed: () async {
           await context.push('/log');
-          ref.invalidate(todaySummaryProvider);
-          ref.invalidate(recentDurationsProvider);
-          ref.invalidate(allEntriesProvider);
+          invalidateSleepProviders(ref);
         },
         child: const Icon(Icons.add),
       ),

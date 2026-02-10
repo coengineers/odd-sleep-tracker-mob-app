@@ -54,7 +54,7 @@ void main() {
       expect(result.last.date, '2025-03-15');
     });
 
-    test('sums duration for multi-entry days', () async {
+    test('keeps longest entry for multi-entry days', () async {
       // Two entries on the same day.
       final wake1 = DateTime(2025, 3, 15, 7, 0);
       final bedtime1 = wake1.subtract(const Duration(hours: 7));
@@ -71,8 +71,8 @@ void main() {
         today,
       );
 
-      // Last item should be today with sum = 7*60 + 90 = 510 minutes.
-      expect(result.last.durationMinutes, 510);
+      // Last item should be today with the longest entry = 7*60 = 420 minutes.
+      expect(result.last.durationMinutes, 420);
     });
 
     test('fills missing days with zero', () async {

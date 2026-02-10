@@ -48,16 +48,19 @@ class InsightsCalculator {
     final todayDate = DateTime(today.year, today.month, today.day);
     final sixDaysAgo = todayDate.subtract(const Duration(days: 6));
 
-    // Group by wakeDate, sum durationMinutes per day.
-    final sumByDate = <String, int>{};
+    // Group by wakeDate, keep the longest entry per day (multiple entries
+    // per day are allowed; summing would produce unrealistic totals like 18h).
+    final bestByDate = <String, int>{};
     for (final entry in entries) {
       final entryDate = DateTime.tryParse(entry.wakeDate);
       if (entryDate == null) continue;
       if (entryDate.isBefore(sixDaysAgo) || entryDate.isAfter(todayDate)) {
         continue;
       }
-      sumByDate[entry.wakeDate] =
-          (sumByDate[entry.wakeDate] ?? 0) + entry.durationMinutes;
+      final current = bestByDate[entry.wakeDate] ?? 0;
+      if (entry.durationMinutes > current) {
+        bestByDate[entry.wakeDate] = entry.durationMinutes;
+      }
     }
 
     // Build exactly 7 data points.
@@ -65,7 +68,7 @@ class InsightsCalculator {
     for (var i = 0; i < 7; i++) {
       final day = sixDaysAgo.add(Duration(days: i));
       final dateStr = _formatDate(day);
-      result.add((date: dateStr, durationMinutes: sumByDate[dateStr] ?? 0));
+      result.add((date: dateStr, durationMinutes: bestByDate[dateStr] ?? 0));
     }
     return result;
   }

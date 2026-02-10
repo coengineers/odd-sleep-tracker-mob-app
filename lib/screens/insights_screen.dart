@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/home_providers.dart';
+import '../providers/invalidate_providers.dart';
 import '../providers/insights_providers.dart';
 import '../widgets/duration_bar_chart.dart';
 import '../widgets/pattern_summary_card.dart';
@@ -22,12 +23,12 @@ class InsightsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Insights')),
       body: insightsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () => Center(child: Semantics(label: 'Loading insights', child: const CircularProgressIndicator())),
+        error: (e, _) => Center(child: Semantics(label: 'Error loading insights', child: Text('Error: $e'))),
         data: (insightsEntries) {
           return allEntriesAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('Error: $e')),
+            loading: () => Center(child: Semantics(label: 'Loading insights', child: const CircularProgressIndicator())),
+            error: (e, _) => Center(child: Semantics(label: 'Error loading insights', child: Text('Error: $e'))),
             data: (allEntries) {
               // Empty state: zero total entries.
               if (allEntries.isEmpty) {
@@ -50,7 +51,10 @@ class InsightsScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(
-                          onPressed: () => context.push('/log'),
+                          onPressed: () async {
+                            await context.push('/log');
+                            invalidateSleepProviders(ref);
+                          },
                           child: const Text('Log sleep'),
                         ),
                       ],
@@ -98,6 +102,7 @@ class _InsightsContent extends StatelessWidget {
           // Duration bar chart card.
           _ChartCard(
             title: 'Last 7 days',
+            semanticsLabel: 'Sleep duration chart for the last 7 days',
             theme: theme,
             colorScheme: colorScheme,
             child: durationAsync.when(
@@ -111,6 +116,7 @@ class _InsightsContent extends StatelessWidget {
           // Quality line chart card.
           _ChartCard(
             title: 'Quality trend (30 days)',
+            semanticsLabel: 'Quality trend chart for the last 30 days',
             theme: theme,
             colorScheme: colorScheme,
             child: qualityAsync.when(
@@ -136,19 +142,21 @@ class _InsightsContent extends StatelessWidget {
 class _ChartCard extends StatelessWidget {
   const _ChartCard({
     required this.title,
+    this.semanticsLabel,
     required this.theme,
     required this.colorScheme,
     required this.child,
   });
 
   final String title;
+  final String? semanticsLabel;
   final ThemeData theme;
   final ColorScheme colorScheme;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final container = Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -165,5 +173,9 @@ class _ChartCard extends StatelessWidget {
         ],
       ),
     );
+    if (semanticsLabel != null) {
+      return Semantics(label: semanticsLabel, child: container);
+    }
+    return container;
   }
 }

@@ -18,7 +18,9 @@ class PatternSummaryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Container(
+    return Semantics(
+      label: 'Sleep patterns summary',
+      child: Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -68,6 +70,7 @@ class PatternSummaryCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

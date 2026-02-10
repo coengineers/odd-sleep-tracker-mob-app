@@ -17,10 +17,13 @@ class QualityLineChart extends StatelessWidget {
     final theme = Theme.of(context);
 
     if (data.isEmpty) {
-      return SizedBox(
-        height: 200,
-        child: Center(
-          child: Text('No quality data', style: theme.textTheme.bodyMedium),
+      return Semantics(
+        label: 'No quality data available',
+        child: SizedBox(
+          height: 200,
+          child: Center(
+            child: Text('No quality data', style: theme.textTheme.bodyMedium),
+          ),
         ),
       );
     }
@@ -34,9 +37,15 @@ class QualityLineChart extends StatelessWidget {
     // Show x-axis labels at roughly weekly intervals.
     final labelInterval = data.length <= 7 ? 1 : (data.length / 4).ceil();
 
-    return SizedBox(
+    // Compute average quality for accessibility label.
+    final avgQuality = data.fold<double>(0, (sum, d) => sum + d.averageQuality) / data.length;
+    final semanticsLabel = 'Quality trend line chart for the last 30 days. Average: ${avgQuality.toStringAsFixed(1)} out of 5';
+
+    return Semantics(
+      label: semanticsLabel,
+      child: SizedBox(
       height: 200,
-      child: LineChart(
+      child: ExcludeSemantics(child: LineChart(
         LineChartData(
           minY: 1,
           maxY: 5,
@@ -119,7 +128,8 @@ class QualityLineChart extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      )),
+    ),
     );
   }
 }

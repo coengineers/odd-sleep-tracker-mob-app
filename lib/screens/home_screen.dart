@@ -1,8 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../dev/seed_data.dart';
+import '../providers/database_providers.dart';
 import '../providers/home_providers.dart';
+import '../providers/invalidate_providers.dart';
 import '../widgets/mini_duration_chart.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -23,14 +27,33 @@ class HomeScreen extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('SleepLog')),
+      appBar: AppBar(
+        title: kDebugMode
+            ? GestureDetector(
+                onLongPress: () async {
+                  final db = ref.read(appDatabaseProvider);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Seeding 90 days of sample data...')),
+                  );
+                  final entries = await seedSampleEntries(db);
+                  invalidateSleepProviders(ref);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Done! Added ${entries.length} entries.')),
+                    );
+                  }
+                },
+                child: const Text('SleepLog'),
+              )
+            : const Text('SleepLog'),
+      ),
       body: todayAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () => Center(child: Semantics(label: 'Loading sleep data', child: const CircularProgressIndicator())),
+        error: (e, _) => Center(child: Semantics(label: 'Error loading data', child: Text('Error: $e'))),
         data: (todayEntry) {
           return durationsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('Error: $e')),
+            loading: () => Center(child: Semantics(label: 'Loading sleep data', child: const CircularProgressIndicator())),
+            error: (e, _) => Center(child: Semantics(label: 'Error loading data', child: Text('Error: $e'))),
             data: (durations) {
               final hasAnyData =
                   durations.any((d) => d.durationMinutes > 0);
@@ -58,8 +81,7 @@ class HomeScreen extends ConsumerWidget {
                         ElevatedButton(
                           onPressed: () async {
                             await context.push('/log');
-                            ref.invalidate(todaySummaryProvider);
-                            ref.invalidate(recentDurationsProvider);
+                            invalidateSleepProviders(ref);
                           },
                           child: const Text('Log sleep'),
                         ),
@@ -89,8 +111,7 @@ class HomeScreen extends ConsumerWidget {
                         theme: theme,
                         onLogSleep: () async {
                           await context.push('/log');
-                          ref.invalidate(todaySummaryProvider);
-                          ref.invalidate(recentDurationsProvider);
+                          invalidateSleepProviders(ref);
                         },
                       ),
                     const SizedBox(height: 24),

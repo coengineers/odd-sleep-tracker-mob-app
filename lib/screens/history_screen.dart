@@ -7,6 +7,7 @@ import '../database/app_database.dart';
 import '../models/sleep_entry_model.dart';
 import '../providers/database_providers.dart';
 import '../providers/home_providers.dart';
+import '../providers/invalidate_providers.dart';
 import '../screens/home_screen.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
@@ -24,14 +25,25 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final entriesAsync = ref.watch(allEntriesProvider);
+
+    // When the provider transitions from loading → data (i.e. it was
+    // invalidated externally, e.g. by the FAB), clear the local cache
+    // so the fresh data is picked up.
+    ref.listen(allEntriesProvider, (previous, next) {
+      if (previous != null && previous.isLoading && next.hasValue) {
+        setState(() {
+          _localEntries = null;
+        });
+      }
+    });
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('History')),
       body: entriesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        loading: () => Center(child: Semantics(label: 'Loading history', child: const CircularProgressIndicator())),
+        error: (e, _) => Center(child: Semantics(label: 'Error loading history', child: Text('Error: $e'))),
         data: (providerEntries) {
           // Use local entries if available (during delete flow), otherwise
           // sync from provider.
@@ -91,9 +103,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     setState(() {
       _localEntries = null;
     });
-    ref.invalidate(allEntriesProvider);
-    ref.invalidate(todaySummaryProvider);
-    ref.invalidate(recentDurationsProvider);
+    invalidateSleepProviders(ref);
   }
 
   Future<void> _deleteEntry(SleepEntry entry, int index) async {
@@ -104,9 +114,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
     final db = ref.read(appDatabaseProvider);
     await db.deleteEntry(entry.id);
-    // Invalidate home providers so they refresh if the user navigates back.
-    ref.invalidate(todaySummaryProvider);
-    ref.invalidate(recentDurationsProvider);
+    invalidateSleepProviders(ref);
 
     if (!mounted) return;
 
@@ -153,44 +161,47 @@ class _EntryTile extends StatelessWidget {
         wakeDate != null ? DateFormat('EEE d MMM').format(wakeDate) : entry.wakeDate;
     final durationLabel = HomeScreen.formatDuration(entry.durationMinutes);
 
-    return Dismissible(
-      key: ValueKey(entry.id),
-      direction: DismissDirection.endToStart,
-      confirmDismiss: (_) => _showConfirmDialog(context),
-      onDismissed: (_) => onDismissed(),
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        color: colorScheme.error,
-        child: Icon(Icons.delete, color: colorScheme.onError),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.outline),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(dateLabel, style: theme.textTheme.titleSmall),
-                    const SizedBox(height: 4),
-                    Text(durationLabel, style: theme.textTheme.bodyMedium),
-                  ],
+    return Semantics(
+      label: 'Sleep entry for $dateLabel, $durationLabel, Quality ${entry.quality} of 5',
+      child: Dismissible(
+        key: ValueKey(entry.id),
+        direction: DismissDirection.endToStart,
+        confirmDismiss: (_) => _showConfirmDialog(context),
+        onDismissed: (_) => onDismissed(),
+        background: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 20),
+          color: colorScheme.error,
+          child: Icon(Icons.delete, color: colorScheme.onError),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: colorScheme.outline),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(dateLabel, style: theme.textTheme.titleSmall),
+                      const SizedBox(height: 4),
+                      Text(durationLabel, style: theme.textTheme.bodyMedium),
+                    ],
+                  ),
                 ),
-              ),
-              Text(
-                'Quality: ${entry.quality} / 5',
-                style: theme.textTheme.bodySmall,
-              ),
-            ],
+                Text(
+                  'Quality: ${entry.quality} / 5',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
           ),
         ),
       ),

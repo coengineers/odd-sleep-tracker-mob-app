@@ -44,9 +44,7 @@ class QualitySelector extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 '$quality',
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontSize: 16,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: isSelected
                       ? colorScheme.onPrimary
