@@ -36,3 +36,6 @@ coverage/
 **/Pods/
 **/Flutter/ephemeral/
 **/Generated.xcconfig
+
+ios
+android

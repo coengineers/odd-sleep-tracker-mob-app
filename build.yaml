@@ -1,0 +1,9 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          store_date_time_values_as_text: true
+          case_from_dart_to_sql: snake_case
+          named_parameters: true
+          generate_manager: false
