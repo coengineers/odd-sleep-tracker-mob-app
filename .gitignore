@@ -29,7 +29,6 @@ coverage/
 
 # Agents & Tools
 .agents
-.claude
 .specify
 
 # Platform build outputs (keep platform dirs, ignore generated)
